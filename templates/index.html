@@ -3,26 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Strength Analyzer</title>
-</head>
-<body>
-    <h2>Enter Your Password</h2>
-    <form method="POST">
-        <input type="password" name="password" required>
-        <button type="submit">Analyze</button>
-    </form>
-    
-    {% if password %}
-        <h3>Results:</h3>
-        <p><b>Password:</b> {{ password }}</p>
-        <p><b>Entropy:</b> {{ entropy }}</p>
-        <p><b>Time to Crack:</b> {{ crack_time }}</p>
-        <p><b>Leaked:</b> {{ 'Yes' if leaked else 'No' }}</p>
-        <p><b>Password Strength:</b> <span style="color: {% if strength == 'Weak' %}red{% elif strength == 'Medium' %}orange{% else %}green{% endif %};">
-            {{ strength }}</span>
-        </p>
-        <p>Suggested Password: <strong>{{ suggested_password }}</strong></p>
+    <title>Password Checker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 
-    {% endif %}
+</head>
+
+<body>
+    <div class="container">
+        <h2>Password Strength Checker</h2>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST" class="password-form">
+            <label for="password">Enter Password:</label>
+            <input type="text" name="password" required>
+            <button type="submit">Check Strength</button>
+        </form>
+
+        {% if password %}
+        <div class="results">
+            <h3>Results:</h3>
+            <p><strong>Password:</strong> <span class="password">{{ password }}</span></p>
+            <p><strong>Entropy:</strong> {{ entropy }}</p>
+            <p><strong>Time to Crack:</strong> {{ crack_time }}</p>
+
+            {% if leaked %}
+                <p class="error"><strong>⚠ Warning:</strong> This password has been leaked before! Consider changing it.</p>
+            {% endif %}
+
+            <p><strong>Password Strength:</strong> 
+                <span class="{{ 'weak' if strength == 'Weak' else 'medium' if strength == 'Medium' else 'strong' }}">{{ strength }}</span>
+            </p>
+            
+            <div class="strength-meter">
+                <div class="bar 
+                    {% if strength == 'Weak' %}weak-bar
+                    {% elif strength == 'Medium' %}medium-bar
+                    {% else %}strong-bar{% endif %}" 
+                    style="width: {% if strength == 'Weak' %}25{% elif strength == 'Medium' %}60{% else %}100{% endif %}%;">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <h3>Generate a Secure Password:</h3>
+        <form method="POST" class="password-form">
+            <label for="length">Length:</label>
+            <input type="number" name="length" value="{{ length }}" min="6" max="64" required>
+            
+            <label for="symbols">Include Symbols:</label>
+            <input type="checkbox" name="symbols" {% if symbols %}checked{% endif %}>
+            
+            <label for="passphrase">Use Passphrase:</label>
+            <input type="checkbox" name="passphrase" {% if passphrase %}checked{% endif %}>
+
+            <label for="complexity">Complexity:</label>
+            <select name="complexity">
+                <option value="mix" {% if complexity == 'mix' %}selected{% endif %}>Mixed</option>
+                <option value="numbers" {% if complexity == 'numbers' %}selected{% endif %}>Numbers Only</option>
+                <option value="words" {% if complexity == 'words' %}selected{% endif %}>Words Only</option>
+            </select>
+            
+            <button type="submit">Generate Password</button>
+        </form>
+
+        {% if suggested_password %}
+            <p><strong>Suggested Password:(Note it down somewhere!)</strong> <span class="generated-password">{{ suggested_password }}</span></p>
+        {% endif %}
+    </div>
 </body>
 </html>
