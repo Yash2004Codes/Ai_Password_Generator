@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Strength Analyzer</title>
+</head>
+<body>
+    <h2>Enter Your Password</h2>
+    <form method="POST">
+        <input type="password" name="password" required>
+        <button type="submit">Analyze</button>
+    </form>
+    
+    {% if password %}
+        <h3>Results:</h3>
+        <p><b>Password:</b> {{ password }}</p>
+        <p><b>Entropy:</b> {{ entropy }}</p>
+        <p><b>Time to Crack:</b> {{ crack_time }}</p>
+        <p><b>Leaked:</b> {{ 'Yes' if leaked else 'No' }}</p>
+        <p><b>Password Strength:</b> <span style="color: {% if strength == 'Weak' %}red{% elif strength == 'Medium' %}orange{% else %}green{% endif %};">
+            {{ strength }}</span>
+        </p>
+        <p>Suggested Password: <strong>{{ suggested_password }}</strong></p>
+
+    {% endif %}
+</body>
+</html>
